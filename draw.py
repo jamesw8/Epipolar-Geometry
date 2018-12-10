@@ -370,6 +370,25 @@ def toggleTestPoints():
 		for i in test_new + test_original + test_arrows:
 			w.itemconfigure(i, state="hidden")
 		test_hidden = True
+# Clears test points
+def clearTestPoints():
+	global test_new, test_original, test_arrows, test_epilines
+
+	assert(len(test_original) > 0), "there are no test points"
+
+	for point in test_new:
+		w.delete(point)
+	for point in test_original:
+		w.delete(point)
+	for arrow in test_arrows:
+		w.delete(arrow)
+	for epiline in test_epilines:
+		w.delete(epiline)
+	test_new = []
+	test_original = []
+	test_arrows = []
+	test_epilines = []
+
 # Create points
 def createPoint(event):
 	global w, width, height, new, coord
@@ -467,6 +486,7 @@ def main():
 	testButton = tkinter.Button(f, text="Add test points", state="normal", command=testPoints)
 	toggleTestButton = tkinter.Button(f, text="Toggle test points", state="normal", command=toggleTestPoints)
 	testEpilines = tkinter.Button(f, text="Calculate test point epilines", state="normal", command=createTestEpipolarLines)
+	resetTestPoints = tkinter.Button(f, text="Clear test points", state="normal", command=clearTestPoints)
 	hidden = False
 	test_hidden = False
 	# progressBar.grid(row=0, column=1)
@@ -502,6 +522,7 @@ def main():
 	testButton.grid(row=0, column=3)
 	toggleTestButton.grid(row=0, column=4)
 	testEpilines.grid(row=0, column=5)
+	resetTestPoints.grid(row=0, column=6)
 	w.grid(row=1)
 	f.grid(row=0)
 	top.mainloop()
