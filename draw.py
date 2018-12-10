@@ -71,6 +71,54 @@ def calculatePicture(normalize=True):
 	# p_image = [[104, 309, 1], [202, 114, 1], [303, 33, 1], [284, 88, 1], [303, 344, 1], [293, 386, 1], [233, 416, 1], [394, 274, 1]]
 	# q_image = [[19, 341, 1], [119, 156, 1], [216, 79, 1], [198, 135, 1], [216, 390, 1], [203, 430, 1], [145, 459, 1], [304, 316, 1]]
 
+	F_estimate = calculateFundamentalMatrix(p_image, q_image, normalize=normalize)
+	# Draw epipoles (2 methods)
+		# THIS WORKS
+		# e1 = U[:,2]
+		# e2 = V[:,2]
+		# drawEpipole(e1)
+		# drawEpipole(e2)
+		# print('e1', np.transpose(e1))
+		# print('e2', np.transpose(e2))
+
+		# print('Getting epipoles using only V')
+		# THIS WORKS TOO
+	e1, e2 = calculateEpipoles(F_estimate)
+	drawEpipole(e1, 0)
+	drawEpipole(e2, width)
+		# drawEpipole(e1, width)
+		# drawEpipole(e2, 0)
+
+		# Draw epipolar lines
+		# for i in p_image:
+		# 	createEpipolarLine(F_estimate, i, 0, 'blue')
+		# 	createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
+		# 	createEpipolarLine(F_estimate, i, width, 'green')
+		# 	createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
+		# for i in q_image:
+		# 	createEpipolarLine(F_estimate, i, 0, 'blue')
+		# 	createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
+		# 	createEpipolarLine(F_estimate, i, width, 'green')
+		# 	createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
+	random_color = lambda: random.randint(0,255)
+	for i in range(len(p_image)):
+		color = '#%02X%02X%02X' % (random_color(),random_color(),random_color())
+		# createEpipolarLine(F_estimate, i, 0, 'blue')
+		# createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
+		createEpipolarLine(F_estimate, p_image[i], width, color)
+		createEpipolarLine(np.transpose(F_estimate), q_image[i], 0, color)
+			# createEpipolarLine(np.transpose(F_estimate), i, width, 'blue')
+		# for i in q_image:
+			# createEpipolarLine(F_estimate, i, 0, 'blue')
+			# THIS ONE WORKS
+			# createEpipolarLine(np.transpose(F_estimate), i, 0, colors[i])
+			# createEpipolarLine(F_estimate, i, width, 'green')
+			# createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
+		
+	# deformed = deform(image, p, q)
+	# img2 = ImageTk.PhotoImage(arrayToPicture(deformed))
+	# w.itemconfigure(img2_canvas, image=img2)
+def calculateFundamentalMatrix(p_image, q_image, normalize):
 	p = q = None
 
 	# Normalize the points for fundamental matrix calculation
@@ -185,52 +233,7 @@ def calculatePicture(normalize=True):
 		print('V', V.shape)
 		pprint(V)
 
-	# Draw epipoles (2 methods)
-		# THIS WORKS
-		# e1 = U[:,2]
-		# e2 = V[:,2]
-		# drawEpipole(e1)
-		# drawEpipole(e2)
-		# print('e1', np.transpose(e1))
-		# print('e2', np.transpose(e2))
-
-		# print('Getting epipoles using only V')
-		# THIS WORKS TOO
-		e1, e2 = calculateEpipoles(F_estimate)
-		drawEpipole(e1, 0)
-		drawEpipole(e2, width)
-		# drawEpipole(e1, width)
-		# drawEpipole(e2, 0)
-
-		# Draw epipolar lines
-		# for i in p_image:
-		# 	createEpipolarLine(F_estimate, i, 0, 'blue')
-		# 	createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
-		# 	createEpipolarLine(F_estimate, i, width, 'green')
-		# 	createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
-		# for i in q_image:
-		# 	createEpipolarLine(F_estimate, i, 0, 'blue')
-		# 	createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
-		# 	createEpipolarLine(F_estimate, i, width, 'green')
-		# 	createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
-		random_color = lambda: random.randint(0,255)
-		for i in range(len(p_image)):
-			color = '#%02X%02X%02X' % (random_color(),random_color(),random_color())
-			# createEpipolarLine(F_estimate, i, 0, 'blue')
-			# createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
-			createEpipolarLine(F_estimate, p_image[i], width, color)
-			createEpipolarLine(np.transpose(F_estimate), q_image[i], 0, color)
-			# createEpipolarLine(np.transpose(F_estimate), i, width, 'blue')
-		# for i in q_image:
-			# createEpipolarLine(F_estimate, i, 0, 'blue')
-			# THIS ONE WORKS
-			# createEpipolarLine(np.transpose(F_estimate), i, 0, colors[i])
-			# createEpipolarLine(F_estimate, i, width, 'green')
-			# createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
-		
-	# deformed = deform(image, p, q)
-	# img2 = ImageTk.PhotoImage(arrayToPicture(deformed))
-	# w.itemconfigure(img2_canvas, image=img2)
+	return F_estimate
 
 def normalize_points(points):
 	x_total = y_total = 0
