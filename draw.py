@@ -324,7 +324,8 @@ def createTestEpipolarLines():
 	assert F_estimate != [], "Need fundamental matrix first"
 
 	for single_test_point in test_original:
-		l = np.dot(F_estimate, single_test_point)
+		point = getActualCoords(single_test_point)
+		l = np.dot(F_estimate, (point[0], point[1], 1))
 
 		y = lambda x: (l[2] + l[0]*x)/(-l[1])
 		x0 = 0
