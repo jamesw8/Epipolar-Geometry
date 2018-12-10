@@ -7,7 +7,7 @@ import random
 
 from pprint import pprint
 
-test_mode = False
+debug_mode = False
 
 image1_name = 'epipolargeometry_dvd_left.jpg'# 'v_left.jpg'#'left_image.jpg'#'185.jpg' #'washington_park_old.jpg'
 image2_name = 'epipolargeometry_dvd_right.jpg'# 'v_right.jpg'#'right_image.jpg'#'139.jpg' #'washington_park_new.jpg'
@@ -63,7 +63,7 @@ def calculatePicture(normalize=True):
 	print("List of points q:", q_image)
 
 	# TEST POINTS HERE
-	if test_mode:
+	if debug_mode:
 		p_image = [(378.0, 98.0), (260.0, 91.0), (227.0, 98.0), (38.0, 94.0), (98.0, 464.0), (273.0, 397.0), (298.0, 383.0), (409.0, 340.0), (293.0, 276.0), (290.0, 228.0), (62.0, 285.0), (294.0, 413.0), (407.0, 359.0), (351.0, 137.0)]
 		q_image = [(1204.0, 51.0), (974.0, 91.0), (921.0, 112.0), (799.0, 131.0), (817.0, 392.0), (946.0, 419.0), (991.0, 426.0), (1223.0, 468.0), (994.0, 307.0), (989.0, 251.0), (807.0, 256.0), (875.0, 430.0), (1057.0, 466.0), (1129.0, 137.0)]
 		p_image = [[i[0], i[1], 1] for i in p_image]
