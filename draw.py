@@ -333,7 +333,9 @@ def createTestEpipolarLines():
 		x1 = width - 1
 		y1 = y(x1)
 		line = w.create_line(x0 + width, y0, x1 + width, y1, fill="#0000ff", width=2)
-		test_epilines.append(line)
+		test_epilines.append((l, line))
+	calculateError()
+
 # Toggle visibility of points and arrows
 def togglePoints():
 	global w, new, original, arrows, hidden
@@ -372,9 +374,31 @@ def toggleTestPoints():
 		test_hidden = True
 # Calculate error in test point epilines
 def calculateError():
-	global test_new, test_epilines
-
+	global w, test_new, test_epilines, test_correct
 	assert(len(test_epilines) > 0), "there are no test epilines"
+	for pair in test_correct:
+		# Oval pair[0]
+		# Text pair[1]
+		w.delete(pair[0])
+		w.delete(pair[1])
+	test_correct.clear()
+
+	d = lambda x0, y0, a, b, c: np.abs((a*x0) + (b*y0) + c) / np.sqrt(a**2 + b**2)
+	x = lambda x0, y0, a, b, c: (((b**2) * x0) - (a*c) - (a*b*y0)) / (a**2 + b**2)
+	y = lambda x_ans, a, b, c: ((a*x_ans) + c) / (-1*b)
+	for point, epiline in zip(test_new, test_epilines):
+		print(getActualCoords(point), epiline[0])
+		p_coords = getActualCoords(point)
+		line = epiline[0]
+		min_d = d(p_coords[0], p_coords[1], line[0], line[1], line[2])
+		print('Min dist', min_d)
+		x_min = x(p_coords[0], p_coords[1], line[0], line[1], line[2])
+		y_min = y(x_min, line[0], line[1], line[2])
+
+		oval = w.create_oval(x_min-9, y_min-9, x_min+9, y_min+9, width=0, fill="#ff0000",activefill="#ff0000",disabledfill="#ff0000")
+		text = w.create_text(x_min+9, y_min+9, text=str(min_d))
+		test_correct.append((oval, text))
+
 '''
 	line_vec = vector(start, end)
 	pnt_vec = vector(start, pnt)
@@ -463,7 +487,7 @@ def updateMouseCoord(event):
 	global w, coord
 	w.itemconfigure(coord, fill='white', text='%d, %d'%(event.x, event.y))
 def main():
-	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows, test_hidden, testButton, test_epilines, F_estimate
+	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows, test_hidden, testButton, test_epilines, test_correct, F_estimate
 	# Initialize window and canvas
 	top = tkinter.Tk()
 	w = tkinter.Canvas(top, bd=-2)
@@ -526,6 +550,7 @@ def main():
 	epipoles = []
 	test_new = []
 	test_original = []
+	test_correct = []
 	test_arrows = []
 	test_epilines = []
 
