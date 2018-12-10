@@ -370,6 +370,27 @@ def toggleTestPoints():
 		for i in test_new + test_original + test_arrows:
 			w.itemconfigure(i, state="hidden")
 		test_hidden = True
+# Calculate error in test point epilines
+def calculateError():
+	global test_new, test_epilines
+
+	assert(len(test_epilines) > 0), "there are no test epilines"
+'''
+	line_vec = vector(start, end)
+	pnt_vec = vector(start, pnt)
+	line_len = length(line_vec)
+	line_unitvec = unit(line_vec)
+	pnt_vec_scaled = scale(pnt_vec, 1.0/line_len)
+	t = dot(line_unitvec, pnt_vec_scaled)    
+	if t < 0.0:
+		t = 0.0
+	elif t > 1.0:
+		t = 1.0
+	nearest = scale(line_vec, t)
+	dist = distance(nearest, pnt_vec)
+	nearest = add(nearest, start)
+	return (dist, nearest)
+	'''
 # Clears test points
 def clearTestPoints():
 	global test_new, test_original, test_arrows, test_epilines
@@ -486,6 +507,7 @@ def main():
 	testButton = tkinter.Button(f, text="Add test points", state="normal", command=testPoints)
 	toggleTestButton = tkinter.Button(f, text="Toggle test points", state="normal", command=toggleTestPoints)
 	testEpilines = tkinter.Button(f, text="Calculate test point epilines", state="normal", command=createTestEpipolarLines)
+	findError = tkinter.Button(f, text="Calculate error", state="normal", command=calculateError)
 	resetTestPoints = tkinter.Button(f, text="Clear test points", state="normal", command=clearTestPoints)
 	hidden = False
 	test_hidden = False
@@ -522,7 +544,8 @@ def main():
 	testButton.grid(row=0, column=3)
 	toggleTestButton.grid(row=0, column=4)
 	testEpilines.grid(row=0, column=5)
-	resetTestPoints.grid(row=0, column=6)
+	findError.grid(row=0, column=6)
+	resetTestPoints.grid(row=0, column=7)
 	w.grid(row=1)
 	f.grid(row=0)
 	top.mainloop()
