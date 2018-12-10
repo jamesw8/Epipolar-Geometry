@@ -8,37 +8,58 @@ import random
 from pprint import pprint
 
 debug_mode = False
+test_mode = False
 
-image1_name = 'epipolargeometry_dvd_left.jpg'# 'v_left.jpg'#'left_image.jpg'#'185.jpg' #'washington_park_old.jpg'
-image2_name = 'epipolargeometry_dvd_right.jpg'# 'v_right.jpg'#'right_image.jpg'#'139.jpg' #'washington_park_new.jpg'
+image1_name = 'v_left.jpg'#'epipolargeometry_dvd_left.jpg'# 'v_left.jpg'#'left_image.jpg'#'185.jpg' #'washington_park_old.jpg'
+image2_name = 'v_right.jpg'#'epipolargeometry_dvd_right.jpg'# 'v_right.jpg'#'right_image.jpg'#'139.jpg' #'washington_park_new.jpg'
 
 # Listener callbacks
 def listenClick(event):
-	global w, current, new, calculateButton
+	global w, current, new, calculateButton, test_new
 	print('Clicking', event.x, event.y)
-	for pt in new:
-		point = w.coords(pt)
-		if (event.x >= point[0] and event.x <= point[2]) and (event.y >= point[1] and event.y <= point[3]):
-			print('Exists', w.type(pt))
-			current = pt
-			return
-	print('Creating point')
-	createPoint(event)
-	if len(new) >0:
-		calculateButton.config(state='normal', text='Calculate')
+	if not test_mode:
+		for pt in new:
+			point = w.coords(pt)
+			if (event.x >= point[0] and event.x <= point[2]) and (event.y >= point[1] and event.y <= point[3]):
+				print('Exists', w.type(pt))
+				current = pt
+				return
+		print('Creating point')
+		createPoint(event)
+		if len(new) >0:
+			calculateButton.config(state='normal', text='Calculate')
+	else:
+		for pt in test_new:
+			point = w.coords(pt)
+			if (event.x >= point[0] and event.x <= point[2]) and (event.y >= point[1] and event.y <= point[3]):
+				print('Exists', w.type(pt))
+				current = pt
+				return
+		print('Creating point')
+		createPoint(event)
+		if len(test_new) >0:
+			calculateButton.config(state='normal', text='Calculate')
 def listenDrag(event):
-	global w, current, new, original, arrows
+	global w, current, new, original, arrows, test_new, test_original, test_arrows
 	print('Dragging', event.x, event.y)
 	print(current != None)
 	if current != None:
 		print('Dragging it!', event.x, event.y)
 		movePoint(event)
-		for pt in range(len(new)):
-			if current == new[pt]:
-				new_coords = getActualCoords(new[pt])
-				orig_coords = getActualCoords(original[pt])
-				old_coords = w.coords(arrows[pt])
-				w.coords(arrows[pt], old_coords[0], old_coords[1], new_coords[0], new_coords[1])
+		if not test_mode:
+			for pt in range(len(new)):
+				if current == new[pt]:
+					new_coords = getActualCoords(new[pt])
+					orig_coords = getActualCoords(original[pt])
+					old_coords = w.coords(arrows[pt])
+					w.coords(arrows[pt], old_coords[0], old_coords[1], new_coords[0], new_coords[1])
+		else:
+			for pt in range(len(test_new)):
+				if current == test_new[pt]:
+					new_coords = getActualCoords(test_new[pt])
+					orig_coords = getActualCoords(test_original[pt])
+					old_coords = w.coords(test_arrows[pt])
+					w.coords(test_arrows[pt], old_coords[0], old_coords[1], new_coords[0], new_coords[1])
 def listenRelease(event):
 	global current, img2
 	print('Releasing', event.x, event.y)
@@ -314,6 +335,11 @@ def printPoints():
 	original, new = getPoints()
 	print('Original', original)
 	print('New', new)
+# Add test points to test fundamental matrix
+def testPoints():
+	global test_mode
+	test_mode = not test_mode
+	print("Test Mode: " + str(test_mode))
 # Create points
 def createPoint(event):
 	global w, width, height, new, coord
@@ -322,10 +348,16 @@ def createPoint(event):
 		return
 	x = event.x
 	y = event.y
-	original.append(w.create_oval(x-9, y-9, x+9, y+9, width=0, fill="#ff0000",activefill="#ff0000",disabledfill="#ff0000"))
-	new.append(w.create_oval(x-9, y-9, x+9, y+9, width=0, fill="#00ff00"))
-	arrow = w.create_line(x, y, x, y, width=2, arrow=tkinter.LAST)
-	arrows.append(arrow)
+	if not test_mode:
+		original.append(w.create_oval(x-9, y-9, x+9, y+9, width=0, fill="#ff0000",activefill="#ff0000",disabledfill="#ff0000"))
+		new.append(w.create_oval(x-9, y-9, x+9, y+9, width=0, fill="#00ff00"))
+		arrow = w.create_line(x, y, x, y, width=2, arrow=tkinter.LAST)
+		arrows.append(arrow)
+	else:
+		test_original.append(w.create_oval(x-9, y-9, x+9, y+9, width=0, fill="#ff00ff",activefill="#ff00ff",disabledfill="#ff00ff"))
+		test_new.append(w.create_oval(x-9, y-9, x+9, y+9, width=0, fill="#0000ff"))
+		arrow = w.create_line(x, y, x, y, width=2, arrow=tkinter.LAST)
+		test_arrows.append(arrow)
 # Move point
 def movePoint(event):
 	global width, height
@@ -361,7 +393,7 @@ def updateMouseCoord(event):
 	global w, coord
 	w.itemconfigure(coord, fill='white', text='%d, %d'%(event.x, event.y))
 def main():
-	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden
+	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows
 	# Initialize window and canvas
 	top = tkinter.Tk()
 	w = tkinter.Canvas(top, bd=-2)
@@ -402,6 +434,7 @@ def main():
 	calculateButton = tkinter.Button(f,text="Need to add points", state='normal', command=calculatePicture)
 	hideButton = tkinter.Button(f,text="Toggle points", state='normal', command=togglePoints)
 	printButton = tkinter.Button(f, text="Export points", state='normal', command=printPoints)
+	testButton = tkinter.Button(f, text="Test fundamental matrix", state="normal", command=testPoints)
 	hidden = False
 	# progressBar.grid(row=0, column=1)
 	# progressBar.grid_remove()
@@ -416,6 +449,9 @@ def main():
 	arrows = []
 	epilines = []
 	epipoles = []
+	test_new = []
+	test_original = []
+	test_arrows = []
 
 	# Coordinate indicator
 	coord = w.create_text(10, height)
@@ -426,6 +462,7 @@ def main():
 	calculateButton.grid(row=0, column=0)
 	hideButton.grid(row=0, column=1)
 	printButton.grid(row=0, column=2)
+	testButton.grid(row=0, column=3)
 	w.grid(row=1)
 	f.grid(row=0)
 	top.mainloop()
