@@ -68,7 +68,7 @@ def listenHover(event):
 	updateMouseCoord(event)
 
 def calculatePicture(normalize=True):
-	global rimg1, img2, img2_canvas, width, epilines, epipoles
+	global rimg1, img2, img2_canvas, width, epilines, epipoles, F_estimate
 	# Reset epilines and epipoles drawn from last run
 	if len(epilines) > 0:
 		for epiline in epilines:
@@ -319,6 +319,20 @@ def createEpipolarLine(F, point, add, color):
 	line = w.create_line(x0 + add, y0, x1 + add, y1, fill=color, width=2) # , arrow=tkinter.LAST)
 	epilines.append(line)
 	# line = w.create_line(l[0], l[1], point[0], point[1], fill='pink', width=2) # , arrow=tkinter.LAST)
+# Draw test point epipolar lines
+def createTestEpipolarLines():
+	assert F_estimate != [], "Need fundamental matrix first"
+
+	for single_test_point in test_original:
+		l = np.dot(F_estimate, single_test_point)
+
+		y = lambda x: (l[2] + l[0]*x)/(-l[1])
+		x0 = 0
+		y0 = y(x0)
+		x1 = width - 1
+		y1 = y(x1)
+		line = w.create_line(x0 + width, y0, x1 + width, y1, fill="#0000ff", width=2)
+		test_epilines.append(line)
 # Toggle visibility of points and arrows
 def togglePoints():
 	global w, new, original, arrows, hidden
@@ -408,7 +422,7 @@ def updateMouseCoord(event):
 	global w, coord
 	w.itemconfigure(coord, fill='white', text='%d, %d'%(event.x, event.y))
 def main():
-	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows, test_hidden, testButton
+	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows, test_hidden, testButton, test_epilines, F_estimate
 	# Initialize window and canvas
 	top = tkinter.Tk()
 	w = tkinter.Canvas(top, bd=-2)
@@ -451,6 +465,7 @@ def main():
 	printButton = tkinter.Button(f, text="Export points", state='normal', command=printPoints)
 	testButton = tkinter.Button(f, text="Add test points", state="normal", command=testPoints)
 	toggleTestButton = tkinter.Button(f, text="Toggle test points", state="normal", command=toggleTestPoints)
+	testEpilines = tkinter.Button(f, text="Calculate test point epilines", state="normal", command=createTestEpipolarLines)
 	hidden = False
 	test_hidden = False
 	# progressBar.grid(row=0, column=1)
@@ -469,6 +484,10 @@ def main():
 	test_new = []
 	test_original = []
 	test_arrows = []
+	test_epilines = []
+
+	#F_estimate intialize
+	F_estimate = []
 
 	# Coordinate indicator
 	coord = w.create_text(10, height)
@@ -481,6 +500,7 @@ def main():
 	printButton.grid(row=0, column=2)
 	testButton.grid(row=0, column=3)
 	toggleTestButton.grid(row=0, column=4)
+	testEpilines.grid(row=0, column=5)
 	w.grid(row=1)
 	f.grid(row=0)
 	top.mainloop()
