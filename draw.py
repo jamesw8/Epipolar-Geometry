@@ -10,8 +10,8 @@ from pprint import pprint
 debug_mode = False
 test_mode = False
 
-image1_name = 'v_left.jpg'#'epipolargeometry_dvd_left.jpg'# 'v_left.jpg'#'left_image.jpg'#'185.jpg' #'washington_park_old.jpg'
-image2_name = 'v_right.jpg'#'epipolargeometry_dvd_right.jpg'# 'v_right.jpg'#'right_image.jpg'#'139.jpg' #'washington_park_new.jpg'
+image1_name = 'v_left.jpg'#'nypl1.jpg'#'epipolargeometry_dvd_left.jpg'# 'v_left.jpg'#'left_image.jpg'#'185.jpg' #'washington_park_old.jpg'
+image2_name = 'v_right.jpg'#'nypl2.jpg'#'epipolargeometry_dvd_right.jpg'# 'v_right.jpg'#'right_image.jpg'#'139.jpg' #'washington_park_new.jpg'
 
 # Listener callbacks
 def listenClick(event):
