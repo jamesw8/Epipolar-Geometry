@@ -338,8 +338,23 @@ def printPoints():
 # Add test points to test fundamental matrix
 def testPoints():
 	global test_mode
+	if not test_mode:
+		testButton.config(state="normal", text="Add control points")
+	else:
+		testButton.config(state="normal", text="Add test points")
 	test_mode = not test_mode
 	print("Test Mode: " + str(test_mode))
+# Toggle visibility of test points and arrows
+def toggleTestPoints():
+	global w, test_new, test_original, test_arrows, test_hidden
+	if test_hidden:
+		for i in test_new + test_original + test_arrows:
+			w.itemconfigure(i, state="normal")
+		test_hidden = False
+	else:
+		for i in test_new + test_original + test_arrows:
+			w.itemconfigure(i, state="hidden")
+		test_hidden = True
 # Create points
 def createPoint(event):
 	global w, width, height, new, coord
@@ -393,7 +408,7 @@ def updateMouseCoord(event):
 	global w, coord
 	w.itemconfigure(coord, fill='white', text='%d, %d'%(event.x, event.y))
 def main():
-	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows
+	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows, test_hidden, testButton
 	# Initialize window and canvas
 	top = tkinter.Tk()
 	w = tkinter.Canvas(top, bd=-2)
@@ -432,10 +447,12 @@ def main():
 	img2_canvas = w.create_image(width,0, image=img2, anchor="nw")
 	f = tkinter.Frame(height=50)
 	calculateButton = tkinter.Button(f,text="Need to add points", state='normal', command=calculatePicture)
-	hideButton = tkinter.Button(f,text="Toggle points", state='normal', command=togglePoints)
+	hideButton = tkinter.Button(f,text="Toggle control points", state='normal', command=togglePoints)
 	printButton = tkinter.Button(f, text="Export points", state='normal', command=printPoints)
-	testButton = tkinter.Button(f, text="Test fundamental matrix", state="normal", command=testPoints)
+	testButton = tkinter.Button(f, text="Add test points", state="normal", command=testPoints)
+	toggleTestButton = tkinter.Button(f, text="Toggle test points", state="normal", command=toggleTestPoints)
 	hidden = False
+	test_hidden = False
 	# progressBar.grid(row=0, column=1)
 	# progressBar.grid_remove()
 
@@ -463,6 +480,7 @@ def main():
 	hideButton.grid(row=0, column=1)
 	printButton.grid(row=0, column=2)
 	testButton.grid(row=0, column=3)
+	toggleTestButton.grid(row=0, column=4)
 	w.grid(row=1)
 	f.grid(row=0)
 	top.mainloop()
