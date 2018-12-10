@@ -390,13 +390,15 @@ def calculateError():
 		print(getActualCoords(point), epiline[0])
 		p_coords = getActualCoords(point)
 		line = epiline[0]
-		min_d = d(p_coords[0], p_coords[1], line[0], line[1], line[2])
+		min_d = d(p_coords[0]-width, p_coords[1], line[0], line[1], line[2])
 		print('Min dist', min_d)
-		x_min = x(p_coords[0], p_coords[1], line[0], line[1], line[2])
+		x_min = x(p_coords[0]-width, p_coords[1], line[0], line[1], line[2])
 		y_min = y(x_min, line[0], line[1], line[2])
-
-		oval = w.create_oval(x_min-9, y_min-9, x_min+9, y_min+9, width=0, fill="#ff0000",activefill="#ff0000",disabledfill="#ff0000")
-		text = w.create_text(x_min+9, y_min+9, text=str(min_d))
+		print('Correct point', x_min, y_min)
+		# oval = w.create_oval(x_min-9, y_min-9, x_min+9, y_min+9, width=0, fill="#ff0000",activefill="#ff0000",disabledfill="#ff0000")
+		# text = w.create_text(x_min+9, y_min+9, text=str(min_d))
+		oval = w.create_oval(x_min-9+width, y_min-9, x_min+9+width, y_min+9, width=0, fill="#ff0000",activefill="#ff0000",disabledfill="#ff0000")
+		text = w.create_text(x_min+9+width, y_min+9, text=str(min_d))
 		test_correct.append((oval, text))
 
 '''
