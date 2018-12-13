@@ -10,8 +10,8 @@ from pprint import pprint
 debug_mode = False
 test_mode = False
 
-image1_name = 'v_left.jpg'#'nypl1.jpg'#'epipolargeometry_dvd_left.jpg'# 'v_left.jpg'#'left_image.jpg'#'185.jpg' #'washington_park_old.jpg'
-image2_name = 'v_right.jpg'#'nypl2.jpg'#'epipolargeometry_dvd_right.jpg'# 'v_right.jpg'#'right_image.jpg'#'139.jpg' #'washington_park_new.jpg'
+image1_name = 'pic410.bmp'
+image2_name = 'pic430.bmp'
 
 # Listener callbacks
 def listenClick(event):
@@ -72,7 +72,7 @@ def calculatePicture(normalize=True):
 	# Reset epilines and epipoles drawn from last run
 	if len(epilines) > 0:
 		for epiline in epilines:
-			w.delete(epiline)
+			w.delete(epiline[1])
 		for epipole in epipoles:
 			w.delete(epipole)
 		epilines.clear()
@@ -80,18 +80,17 @@ def calculatePicture(normalize=True):
 	p_image, q_image = getPoints()
 	p_image = [[i[0], i[1], 1] for i in p_image]
 	q_image = [[i[0]-width, i[1], 1] for i in q_image]
-	print("List of points p:", p_image)
-	print("List of points q:", q_image)
+
 
 	# TEST POINTS HERE
 	if debug_mode:
-		p_image = [(378.0, 98.0), (260.0, 91.0), (227.0, 98.0), (38.0, 94.0), (98.0, 464.0), (273.0, 397.0), (298.0, 383.0), (409.0, 340.0), (293.0, 276.0), (290.0, 228.0), (62.0, 285.0), (294.0, 413.0), (407.0, 359.0), (351.0, 137.0)]
-		q_image = [(1204.0, 51.0), (974.0, 91.0), (921.0, 112.0), (799.0, 131.0), (817.0, 392.0), (946.0, 419.0), (991.0, 426.0), (1223.0, 468.0), (994.0, 307.0), (989.0, 251.0), (807.0, 256.0), (875.0, 430.0), (1057.0, 466.0), (1129.0, 137.0)]
+		p_image = [(241.0, 417.0), (372.0, 525.0), (406.0, 316.0), (386.0, 262.0), (354.0, 97.0), (125.0, 244.0), (55.0, 578.0), (465.0, 60.0)]
+		q_image = [(633.0, 462.0), (754.0, 574.0), (795.0, 359.0), (775.0, 306.0), (743.0, 144.0), (520.0, 284.0), (530.0, 587.0), (855.0, 105.0)]
 		p_image = [[i[0], i[1], 1] for i in p_image]
-		q_image = [[i[0], i[1], 1] for i in q_image]
-	# TEST FOR PIC410.bmp and PIC430.bmp
-	# p_image = [[104, 309, 1], [202, 114, 1], [303, 33, 1], [284, 88, 1], [303, 344, 1], [293, 386, 1], [233, 416, 1], [394, 274, 1]]
-	# q_image = [[19, 341, 1], [119, 156, 1], [216, 79, 1], [198, 135, 1], [216, 390, 1], [203, 430, 1], [145, 459, 1], [304, 316, 1]]
+		q_image = [[i[0]-width, i[1], 1] for i in q_image]
+
+	print("List of points p:", p_image)
+	print("List of points q:", q_image)
 
 	F_estimate = calculateFundamentalMatrix(p_image, q_image, normalize=normalize)
 	# Draw epipoles (2 methods)
@@ -106,40 +105,17 @@ def calculatePicture(normalize=True):
 		# print('Getting epipoles using only V')
 		# THIS WORKS TOO
 	e1, e2 = calculateEpipoles(F_estimate)
+	print('Epipoles', e1, e2)
 	drawEpipole(e1, 0)
 	drawEpipole(e2, width)
-		# drawEpipole(e1, width)
-		# drawEpipole(e2, 0)
 
-		# Draw epipolar lines
-		# for i in p_image:
-		# 	createEpipolarLine(F_estimate, i, 0, 'blue')
-		# 	createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
-		# 	createEpipolarLine(F_estimate, i, width, 'green')
-		# 	createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
-		# for i in q_image:
-		# 	createEpipolarLine(F_estimate, i, 0, 'blue')
-		# 	createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
-		# 	createEpipolarLine(F_estimate, i, width, 'green')
-		# 	createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
 	random_color = lambda: random.randint(0,255)
 	for i in range(len(p_image)):
 		color = '#%02X%02X%02X' % (random_color(),random_color(),random_color())
-		# createEpipolarLine(F_estimate, i, 0, 'blue')
-		# createEpipolarLine(np.transpose(F_estimate), i, 0, 'blue')
+
 		createEpipolarLine(F_estimate, p_image[i], width, color)
 		createEpipolarLine(np.transpose(F_estimate), q_image[i], 0, color)
-			# createEpipolarLine(np.transpose(F_estimate), i, width, 'blue')
-		# for i in q_image:
-			# createEpipolarLine(F_estimate, i, 0, 'blue')
-			# THIS ONE WORKS
-			# createEpipolarLine(np.transpose(F_estimate), i, 0, colors[i])
-			# createEpipolarLine(F_estimate, i, width, 'green')
-			# createEpipolarLine(np.transpose(F_estimate), i, width, 'green')
-		
-	# deformed = deform(image, p, q)
-	# img2 = ImageTk.PhotoImage(arrayToPicture(deformed))
-	# w.itemconfigure(img2_canvas, image=img2)
+
 def calculateFundamentalMatrix(p_image, q_image, normalize):
 	p = q = None
 
@@ -177,14 +153,14 @@ def calculateFundamentalMatrix(p_image, q_image, normalize):
 		yr = q[i][1]
 
 	
-		A[i][0] = xl * xr # p[i][0] * q[i][0]
-		A[i][1] = yl * xr # p[i][0] * q[i][1]
-		A[i][2] = xr # p[i][0]
-		A[i][3] = xl * yr # p[i][1] * q[i][0]
-		A[i][4] = yl * yr # p[i][1] * q[i][1]
-		A[i][5] = yr # p[i][1]
-		A[i][6] = xl # q[i][0]
-		A[i][7] = yl # p[i][1]
+		A[i][0] = xl * xr 	# p[i][0] * q[i][0]
+		A[i][1] = yl * xr 	# p[i][0] * q[i][1]
+		A[i][2] = xr 		# p[i][0]
+		A[i][3] = xl * yr 	# p[i][1] * q[i][0]
+		A[i][4] = yl * yr 	# p[i][1] * q[i][1]
+		A[i][5] = yr 		# p[i][1]
+		A[i][6] = xl 		# q[i][0]
+		A[i][7] = yl 		# p[i][1]
 		A[i][8] = 1
 
 	print('A rank', np.linalg.matrix_rank(A))
@@ -205,12 +181,6 @@ def calculateFundamentalMatrix(p_image, q_image, normalize):
 
 	print('x', x.shape)
 	pprint(x)
-	# print('U', U.shape)
-	# pprint(U)
-	# print('D', D.shape)
-	# pprint(D)
-	# print('V', V.shape)
-	# pprint(V)
 
 	skip_zero = False
 	# Set smallest singular value to 0 to enforce rank of 2
@@ -321,7 +291,12 @@ def createEpipolarLine(F, point, add, color):
 	# line = w.create_line(l[0], l[1], point[0], point[1], fill='pink', width=2) # , arrow=tkinter.LAST)
 # Draw test point epipolar lines
 def createTestEpipolarLines():
+	global w, test_epilines
 	assert F_estimate != [], "Need fundamental matrix first"
+
+	for epiline in test_epilines:
+		w.delete(epiline)
+	test_epilines.clear()
 
 	for single_test_point in test_original:
 		point = getActualCoords(single_test_point)
@@ -363,13 +338,13 @@ def testPoints():
 	print("Test Mode: " + str(test_mode))
 # Toggle visibility of test points and arrows
 def toggleTestPoints():
-	global w, test_new, test_original, test_arrows, test_hidden
+	global w, test_new, test_original, test_arrows, test_correct, test_hidden, test_epilines
 	if test_hidden:
-		for i in test_new + test_original + test_arrows:
+		for i in test_new + test_original + test_arrows + test_correct + test_epilines:
 			w.itemconfigure(i, state="normal")
 		test_hidden = False
 	else:
-		for i in test_new + test_original + test_arrows:
+		for i in test_new + test_original + test_arrows + test_correct + test_epilines:
 			w.itemconfigure(i, state="hidden")
 		test_hidden = True
 # Calculate error in test point epilines
@@ -386,6 +361,7 @@ def calculateError():
 	d = lambda x0, y0, a, b, c: np.abs((a*x0) + (b*y0) + c) / np.sqrt(a**2 + b**2)
 	x = lambda x0, y0, a, b, c: (((b**2) * x0) - (a*c) - (a*b*y0)) / (a**2 + b**2)
 	y = lambda x_ans, a, b, c: ((a*x_ans) + c) / (-1*b)
+	print('Test epilines', test_epilines)
 	for point, epiline in zip(test_new, test_epilines):
 		print(getActualCoords(point), epiline[0])
 		p_coords = getActualCoords(point)
@@ -419,7 +395,7 @@ def calculateError():
 	'''
 # Clears test points
 def clearTestPoints():
-	global test_new, test_original, test_arrows, test_epilines
+	global test_new, test_original, test_arrows, test_correct, test_epilines
 
 	assert(len(test_original) > 0), "there are no test points"
 
@@ -429,11 +405,15 @@ def clearTestPoints():
 		w.delete(point)
 	for arrow in test_arrows:
 		w.delete(arrow)
+	for oval_text in test_correct:
+		w.delete(oval_text[0])
+		w.delete(oval_text[1])
 	for epiline in test_epilines:
-		w.delete(epiline)
+		w.delete(epiline[1])
 	test_new = []
 	test_original = []
 	test_arrows = []
+	test_correct = []
 	test_epilines = []
 
 # Create points
@@ -503,24 +483,18 @@ def main():
 	# Open Image
 	rimg1 = Image.open(image1_name)
 	rimg2 = Image.open(image2_name)
-	rimg1 = rimg1.resize((640, 480))
-	rimg2 = rimg2.resize((640, 480))
+
+	resize = False
+
+	if resize:
+		rimg1 = rimg1.resize((640, 480))
+		rimg2 = rimg2.resize((640, 480))
 	[width, height] = rimg1.size
 
 	# Set window to twice width to fit two pictures
 	w.config(width=width*2, height=height)
 	img1 = ImageTk.PhotoImage(rimg1)
 
-	# Figure out transformation matrix/calculations here
-	# a = 1
-	# b = 0.5
-	# c = 1
-	# d = 0
-	# e = 0.5
-	# f = 0
-	# rimg2 = rimg1.transform((width, height), Image.AFFINE, (a,b,c,d,e,f), Image.BICUBIC)
-	# img2 = ImageTk.PhotoImage(rimg2)
-	#rimg2 = None
 	# Create images
 	w.create_image(0, 0, image=img1, anchor="nw")
 	w.create_line(width, 0, width, height)
@@ -537,11 +511,6 @@ def main():
 	resetTestPoints = tkinter.Button(f, text="Clear test points", state="normal", command=clearTestPoints)
 	hidden = False
 	test_hidden = False
-	# progressBar.grid(row=0, column=1)
-	# progressBar.grid_remove()
-
-	
-	# w.create_window(width*2, 0, window=calculateButton, anchor="nw")
 
 	# Store points and lines
 	current = None
@@ -562,9 +531,7 @@ def main():
 	# Coordinate indicator
 	coord = w.create_text(10, height)
 	w.itemconfigure(coord, text='0 0', anchor="sw")
-	# w.pack(expand="yes", fill="both")
 	top.geometry('{}x{}'.format(2*width, height+50))
-	# deformButton.pack()
 	calculateButton.grid(row=0, column=0)
 	hideButton.grid(row=0, column=1)
 	printButton.grid(row=0, column=2)
