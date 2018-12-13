@@ -271,24 +271,19 @@ def drawEpipole(e, add):
 # Draw epipolar line
 def createEpipolarLine(F, point, add, color):
 	global w, width, height, new, coord, epilines
-	# e_x = e[0] / e[2]
-	# e_y = e[1] / e[2]
-	# print('Epipole', e_x, e_y)
+
 	l = np.dot(F, point)
 
 	print('Epipolar line', l)
 
-	# if e_x < 0 or e_x > width or e_y < 0 or e_y > height:
-	# 	w.itemconfigure(coord, text=w.itemcget(coord, 'text')+' Out of bounds')
-	# 	return
-	y = lambda x: (l[2] + l[0]*x)/(-l[1]) # -(l[0]*x + l[2]) / l[1]
+	y = lambda x: (l[2] + l[0]*x)/(-l[1]) 
 	x0 = 0
 	y0 = y(x0)
 	x1 = width - 1
 	y1 = y(x1)
-	line = w.create_line(x0 + add, y0, x1 + add, y1, fill=color, width=2) # , arrow=tkinter.LAST)
+	line = w.create_line(x0 + add, y0, x1 + add, y1, fill=color, width=2)
 	epilines.append(line)
-	# line = w.create_line(l[0], l[1], point[0], point[1], fill='pink', width=2) # , arrow=tkinter.LAST)
+	
 # Draw test point epipolar lines
 def createTestEpipolarLines():
 	global w, test_epilines
@@ -371,28 +366,10 @@ def calculateError():
 		x_min = x(p_coords[0]-width, p_coords[1], line[0], line[1], line[2])
 		y_min = y(x_min, line[0], line[1], line[2])
 		print('Correct point', x_min, y_min)
-		# oval = w.create_oval(x_min-9, y_min-9, x_min+9, y_min+9, width=0, fill="#ff0000",activefill="#ff0000",disabledfill="#ff0000")
-		# text = w.create_text(x_min+9, y_min+9, text=str(min_d))
 		oval = w.create_oval(x_min-9+width, y_min-9, x_min+9+width, y_min+9, width=0, fill="#ff0000",activefill="#ff0000",disabledfill="#ff0000")
 		text = w.create_text(x_min+9+width, y_min+9, text=str(min_d))
 		test_correct.append((oval, text))
 
-'''
-	line_vec = vector(start, end)
-	pnt_vec = vector(start, pnt)
-	line_len = length(line_vec)
-	line_unitvec = unit(line_vec)
-	pnt_vec_scaled = scale(pnt_vec, 1.0/line_len)
-	t = dot(line_unitvec, pnt_vec_scaled)    
-	if t < 0.0:
-		t = 0.0
-	elif t > 1.0:
-		t = 1.0
-	nearest = scale(line_vec, t)
-	dist = distance(nearest, pnt_vec)
-	nearest = add(nearest, start)
-	return (dist, nearest)
-	'''
 # Clears test points
 def clearTestPoints():
 	global test_new, test_original, test_arrows, test_correct, test_epilines
