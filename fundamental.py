@@ -3,7 +3,7 @@ import numpy as np
 
 from pprint import pprint
 
-def calculate_8point_fundamental_matrix(p_image, q_image, normalize):
+def calculate_8point_fundamental_matrix(p_image, q_image, normalize=True):
 	p = q = None
 
 	# Normalize the points for fundamental matrix calculation
@@ -112,7 +112,7 @@ def calculate_8point_fundamental_matrix(p_image, q_image, normalize):
 		print('V', V.shape)
 		pprint(V)
 
-	return F_estimate
+	return F_estimate, [1]*len(p_image)
 
 def calculate_7point_fundamental_matrix(p_image, q_image):
 	F, mask = cv2.findFundamentalMat(p_image, q_image, cv2.FM_7POINT)
@@ -154,7 +154,7 @@ def normalize_points(points):
 		new_points.append(np.matmul(T, points[i]))
 	# print('Normalized', new_points)
 	return new_points, T
-	
+
 # Get epipoles
 def calculateEpipoles(F):
 	U, s, Vt = np.linalg.svd(F)
