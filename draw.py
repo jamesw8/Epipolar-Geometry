@@ -1,3 +1,7 @@
+'''
+James Wong 1903
+'''
+
 import tkinter
 from tkinter import ttk
 from PIL import ImageTk, Image
@@ -7,11 +11,12 @@ import random
 
 from pprint import pprint
 
-debug_mode = False
+debug_mode = True
 test_mode = False
+normalize = True
 
-image1_name = 'pic410.bmp'
-image2_name = 'pic430.bmp'
+image1_name = 'washington_park_old.jpg'
+image2_name = 'washington_park_new.jpg'
 
 # Listener callbacks
 def listenClick(event):
@@ -67,12 +72,12 @@ def listenRelease(event):
 def listenHover(event):
 	updateMouseCoord(event)
 
-def calculatePicture(normalize=True):
+def calculatePicture(normalize=normalize):
 	global rimg1, img2, img2_canvas, width, epilines, epipoles, F_estimate
 	# Reset epilines and epipoles drawn from last run
 	if len(epilines) > 0:
 		for epiline in epilines:
-			w.delete(epiline[1])
+			w.delete(epiline)
 		for epipole in epipoles:
 			w.delete(epipole)
 		epilines.clear()
@@ -84,8 +89,9 @@ def calculatePicture(normalize=True):
 
 	# TEST POINTS HERE
 	if debug_mode:
-		p_image = [(241.0, 417.0), (372.0, 525.0), (406.0, 316.0), (386.0, 262.0), (354.0, 97.0), (125.0, 244.0), (55.0, 578.0), (465.0, 60.0)]
-		q_image = [(633.0, 462.0), (754.0, 574.0), (795.0, 359.0), (775.0, 306.0), (743.0, 144.0), (520.0, 284.0), (530.0, 587.0), (855.0, 105.0)]
+		p_image = [(254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)]
+		q_image = [(973.0, 209.0), (1107.0, 198.0), (970.0, 236.0), (1113.0, 231.0), (1157.0, 162.0), (1182.0, 138.0), (1122.0, 143.0), (983.0, 287.0), (730.0, 400.0), (1094.0, 286.0), (1220.0, 231.0)]
+
 		p_image = [[i[0], i[1], 1] for i in p_image]
 		q_image = [[i[0]-width, i[1], 1] for i in q_image]
 
@@ -241,7 +247,7 @@ def normalize_points(points):
 	y_mean = y_total / y_count
 
 	S = scaling_factor = (2**0.5) / np.std(np.concatenate([points[:,0], points[:,1]]))
-	print('S', S)
+	print('Scaling factor', S)
 	# Translation matrix to normalize points
 	T = np.array([
 		[S, 0, -S*x_mean],
@@ -290,7 +296,7 @@ def createTestEpipolarLines():
 	assert F_estimate != [], "Need fundamental matrix first"
 
 	for epiline in test_epilines:
-		w.delete(epiline)
+		w.delete(epiline[1])
 	test_epilines.clear()
 
 	for single_test_point in test_original:
@@ -335,11 +341,11 @@ def testPoints():
 def toggleTestPoints():
 	global w, test_new, test_original, test_arrows, test_correct, test_hidden, test_epilines
 	if test_hidden:
-		for i in test_new + test_original + test_arrows + test_correct + test_epilines:
+		for i in test_new + test_original + test_arrows + test_correct + [epiline[1] for epiline in test_epilines]:
 			w.itemconfigure(i, state="normal")
 		test_hidden = False
 	else:
-		for i in test_new + test_original + test_arrows + test_correct + test_epilines:
+		for i in test_new + test_original + test_arrows + test_correct + [epiline[1] for epiline in test_epilines]:
 			w.itemconfigure(i, state="hidden")
 		test_hidden = True
 # Calculate error in test point epilines
