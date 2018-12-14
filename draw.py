@@ -14,6 +14,8 @@ from pprint import pprint
 debug_mode = True
 test_mode = False
 normalize = True
+resize = True
+new_image_size = ((640, 480))
 
 image1_name = 'washington_park_old.jpg'
 image2_name = 'washington_park_new.jpg'
@@ -89,8 +91,8 @@ def calculatePicture(normalize=normalize):
 
 	# TEST POINTS HERE
 	if debug_mode:
-		p_image = [(254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)]
-		q_image = [(973.0, 209.0), (1107.0, 198.0), (970.0, 236.0), (1113.0, 231.0), (1157.0, 162.0), (1182.0, 138.0), (1122.0, 143.0), (983.0, 287.0), (730.0, 400.0), (1094.0, 286.0), (1220.0, 231.0)]
+		p_image.extend([(254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)])
+		q_image.extend([(973.0, 209.0), (1107.0, 198.0), (970.0, 236.0), (1113.0, 231.0), (1157.0, 162.0), (1182.0, 138.0), (1122.0, 143.0), (983.0, 287.0), (730.0, 400.0), (1094.0, 286.0), (1220.0, 231.0)])
 
 		p_image = [[i[0], i[1], 1] for i in p_image]
 		q_image = [[i[0]-width, i[1], 1] for i in q_image]
@@ -452,7 +454,7 @@ def updateMouseCoord(event):
 	global w, coord
 	w.itemconfigure(coord, fill='white', text='%d, %d'%(event.x, event.y))
 def main():
-	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows, test_hidden, testButton, test_epilines, test_correct, F_estimate
+	global w, width, height, new, original, arrows, coord, rimg1, img2, img2_canvas, calculateButton, epilines, epipoles, hidden, test_new, test_original, test_arrows, test_hidden, testButton, test_epilines, test_correct, F_estimate, resize, new_image_size
 	# Initialize window and canvas
 	top = tkinter.Tk()
 	w = tkinter.Canvas(top, bd=-2)
@@ -467,11 +469,9 @@ def main():
 	rimg1 = Image.open(image1_name)
 	rimg2 = Image.open(image2_name)
 
-	resize = False
-
 	if resize:
-		rimg1 = rimg1.resize((640, 480))
-		rimg2 = rimg2.resize((640, 480))
+		rimg1 = rimg1.resize(new_image_size)
+		rimg2 = rimg2.resize(new_image_size)
 	[width, height] = rimg1.size
 
 	# Set window to twice width to fit two pictures
