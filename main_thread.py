@@ -5,7 +5,10 @@ from subprocess import call
 
 # Script calls
 def call_draw(algorithm):
-	call(["python", "draw.py", "-a", algorithm])
+	try:
+		call(["python", "draw.py", "-a", algorithm])
+	except ImportError:
+		call(["python3", "draw.py", "-a", algorithm])
 
 if __name__ == '__main__':
 	thread1 = threading.Thread(target=call_draw, args=('7point',))
