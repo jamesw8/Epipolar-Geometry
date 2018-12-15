@@ -114,17 +114,21 @@ def calculate_8point_fundamental_matrix(p_image, q_image, normalize=True):
 
 	return F_estimate, [1]*len(p_image)
 
+def calculate_opencv_8point_fundamental_matrix(p_image, q_image):
+	F, mask = cv2.findFundamentalMat(p_image, q_image, cv2.FM_8POINT)
+	return F, mask
+
 def calculate_7point_fundamental_matrix(p_image, q_image):
 	F, mask = cv2.findFundamentalMat(p_image, q_image, cv2.FM_7POINT)
 	return F, mask
 
 # TODO: Add extra params
 def calculate_RANSAC_fundamental_matrix(p_image, q_image):
-	F, mask = cv2.findFundamentalMat(p_image, q_image, cv2.FM_RANSAC)
+	F, mask = cv2.findFundamentalMat(p_image, q_image, cv2.FM_RANSAC, 2, 0)
 	return F, mask
 
 def calculate_LMEDS_fundamental_matrix(p_image, q_image):
-	F, mask = cv2.findFundamentalMat(p_image, q_image, cv2.FM_LMEDS)
+	F, mask = cv2.findFundamentalMat(p_image, q_image, cv2.FM_LMEDS, 0.5)
 	return F, mask
 
 # Normalize points for 8point algorithm
@@ -162,3 +166,25 @@ def calculateEpipoles(F):
 	U, s, Vt = np.linalg.svd(np.transpose(F))
 	e2 = Vt[-1]
 	return e1, e2
+
+if __name__ == '__main__':
+	width = 640
+	from draw import debug_p_image as p_image
+	from draw import debug_q_image as q_image
+	# p_image = [(254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)]
+	# q_image = [(973.0, 209.0), (1107.0, 198.0), (970.0, 236.0), (1113.0, 231.0), (1157.0, 162.0), (1182.0, 138.0), (1122.0, 143.0), (983.0, 287.0), (730.0, 400.0), (1094.0, 286.0), (1220.0, 231.0)]
+	p_image = [[i[0], i[1], 1] for i in p_image]
+	q_image = [[i[0]-width, i[1], 1] for i in q_image]
+	p_image = np.float64(p_image)
+	q_image = np.float64(q_image)
+	_7pt = calculate_7point_fundamental_matrix(p_image, q_image)
+	cv_8pt = calculate_8point_fundamental_matrix(p_image, q_image)
+	_8pt = calculate_8point_fundamental_matrix(p_image, q_image)
+	RANSAC = calculate_RANSAC_fundamental_matrix(p_image, q_image)
+	LMEDS = calculate_LMEDS_fundamental_matrix(p_image, q_image)
+	print('7Pt', _7pt)
+	print('8Pt', _8pt)
+	print('CV 8Pt', cv_8pt)
+	print('RANSAC', RANSAC)
+	print('LMEDS', LMEDS)
+	
