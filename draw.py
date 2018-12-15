@@ -1,5 +1,6 @@
 '''
-James Wong 1903
+James Wong
+Vincent Yu
 '''
 
 import tkinter
