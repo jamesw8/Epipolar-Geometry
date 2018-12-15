@@ -196,7 +196,7 @@ def createEpipolarLine(F, point, add, color):
 	
 # Draw test point epipolar lines
 def createTestEpipolarLines():
-	global w, test_epilines
+	global w, test_epilines, test_original, test_new
 
 	assert F_estimate != [], "Need fundamental matrix first"
 
@@ -235,7 +235,7 @@ def printPoints():
 	print('New', new)
 # Add test points to test fundamental matrix
 def testPoints():
-	global test_mode, preset_test_points_mode
+	global test_mode, preset_test_points_mode, test_epilines
 	if not test_mode:
 		if preset_test_points_mode:
 			test_original = preset_test_p
@@ -246,8 +246,15 @@ def testPoints():
 				x2 = test_new[index][0]
 				y2 = test_new[index][1]
 				#print(x1, y1, x2,y2)
-				arrow = w.create_line(x1, y1, x2, y2, width=2, arrow=tkinter.LAST)
-				test_arrows.append(arrow)
+				point1 = lambda: None
+				setattr(point1, 'x', x1)
+				setattr(point1, 'y', y1)
+				point2 = lambda: None
+				setattr(point2, 'x', x2)
+				setattr(point2, 'y', y2)
+				createPresetTestPoint(point1, point2)
+				# arrow = w.create_line(x1, y1, x2, y2, width=2, arrow=tkinter.LAST)
+				# test_arrows.append(arrow)
 			createTestEpipolarLines()
 		testButton.config(state="normal", text="Add control points")
 	else:
@@ -317,8 +324,8 @@ def clearTestPoints():
 	test_epilines = []
 
 # Create points
-def createPoint(event):
-	global w, width, height, new, coord
+def createPoint(event, other=None):
+	global w, width, height, new, coord, test_mode, test_original, test_new, test_arrows
 	if event.x < 0 or event.x > width or event.y < 0 or event.y > height:
 		w.itemconfigure(coord, text=w.itemcget(coord, 'text')+' Out of bounds')
 		return
@@ -334,6 +341,17 @@ def createPoint(event):
 		test_new.append(w.create_oval(x-9, y-9, x+9, y+9, width=0, fill="#0000ff"))
 		arrow = w.create_line(x, y, x, y, width=2, arrow=tkinter.LAST)
 		test_arrows.append(arrow)
+# Create test points
+def createPresetTestPoint(point1, point2):
+	global w, width, height, new, coord, test_mode, test_original, test_new, test_arrows
+	x1 = point1.x
+	y1 = point1.y
+	x2 = point2.x
+	y2 = point2.y
+	test_original.append(w.create_oval(x1-9, y1-9, x1+9, y1+9, width=0, fill="#ff00ff",activefill="#ff00ff",disabledfill="#ff00ff"))
+	test_new.append(w.create_oval(x2-9, y2-9, x2+9, y2+9, width=0, fill="#0000ff"))
+	arrow = w.create_line(x1, y1, x2, y2, width=2, arrow=tkinter.LAST)
+	test_arrows.append(arrow)
 # Move point
 def movePoint(event):
 	global width, height
