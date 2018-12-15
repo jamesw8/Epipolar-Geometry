@@ -46,8 +46,8 @@ def get_algorithm_from_args(algorithm_name):
 
 algorithm = get_algorithm_from_args(algorithm_name)
 debug_mode = True
-debug_p_image = [(254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)]
-debug_q_image = [(973.0, 209.0), (1107.0, 198.0), (970.0, 236.0), (1113.0, 231.0), (1157.0, 162.0), (1182.0, 138.0), (1122.0, 143.0), (983.0, 287.0), (730.0, 400.0), (1094.0, 286.0), (1220.0, 231.0)]
+debug_p_image = [(165.0, 32.0), (125.0, 21.0), (253.0, 141.0), (392.0, 146.0), (335.0, 57.0), (398.0, 65.0), (385.0, 5.0), (508.0, 186.0), (323.0, 205.0), (269.0, 224.0), (378.0, 229.0), (362.0, 252.0), (286.0, 251.0), (286.0, 306.0), (152.0, 242.0), (153.0, 335.0), (295.0, 334.0), (311.0, 334.0), (446.0, 334.0), (33.0, 5.0), (165.0, 337.0)]#[(149.0, 338.0), (227.0, 214.0), (254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)]
+debug_q_image = [(969.0, 149.0), (930.0, 136.0), (972.0, 207.0), (1106.0, 198.0), (1120.0, 142.0), (1179.0, 139.0), (1159.0, 94.0), (1217.0, 223.0), (1041.0, 267.0), (983.0, 281.0), (1097.0, 281.0), (1081.0, 311.0), (996.0, 310.0), (999.0, 359.0), (848.0, 310.0), (720.0, 394.0), (927.0, 395.0), (943.0, 398.0), (1122.0, 398.0), (867.0, 140.0), (737.0, 392.0)]#[(926.0, 396.0), (1127.0, 285.0), (973.0, 209.0), (1107.0, 198.0), (970.0, 236.0), (1113.0, 231.0), (1157.0, 162.0), (1182.0, 138.0), (1122.0, 143.0), (983.0, 287.0), (730.0, 400.0), (1094.0, 286.0), (1220.0, 231.0)]
 
 preset_test_points_mode = True
 preset_test_p = [(254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)]
@@ -116,7 +116,7 @@ def listenHover(event):
 	updateMouseCoord(event)
 
 def calculatePicture(normalize=normalize):
-	global rimg1, img2, img2_canvas, width, epilines, epipoles, F_estimate, debug_p_image, debug_q_image
+	global new, original, rimg1, img2, img2_canvas, width, epilines, epipoles, F_estimate, debug_p_image, debug_q_image
 	# Reset epilines and epipoles drawn from last run
 	if len(epilines) > 0:
 		for epiline in epilines:
@@ -235,7 +235,7 @@ def printPoints():
 	print('New', new)
 # Add test points to test fundamental matrix
 def testPoints():
-	global test_mode, preset_test_points_mode, test_epilines
+	global test_mode, preset_test_points_mode
 	if not test_mode:
 		if preset_test_points_mode:
 			test_original = preset_test_p
@@ -300,6 +300,10 @@ def calculateError():
 		text = w.create_text(x_min+9+width, y_min+9, text=str(min_d))
 		test_correct.append((oval, text))
 
+# Print errors
+def printError():
+	global w, test_correct
+	print(sorted([w.itemcget(text, 'text') for text in [pair[1] for pair in test_correct]], reverse=True))
 # Clears test points
 def clearTestPoints():
 	global test_new, test_original, test_arrows, test_correct, test_epilines
@@ -427,6 +431,7 @@ def createWindow():
 	toggleTestButton = tkinter.Button(f, text="Toggle test points", state="normal", command=toggleTestPoints)
 	testEpilines = tkinter.Button(f, text="Calculate test point epilines", state="normal", command=createTestEpipolarLines)
 	findError = tkinter.Button(f, text="Calculate error", state="normal", command=calculateError)
+	printErrorButton = tkinter.Button(f, text="Print errors", state="normal", command=printError)
 	resetTestPoints = tkinter.Button(f, text="Clear test points", state="normal", command=clearTestPoints)
 	hidden = False
 	test_hidden = False
@@ -458,7 +463,8 @@ def createWindow():
 	toggleTestButton.grid(row=0, column=4)
 	testEpilines.grid(row=0, column=5)
 	findError.grid(row=0, column=6)
-	resetTestPoints.grid(row=0, column=7)
+	printErrorButton.grid(row=0, column=7)
+	resetTestPoints.grid(row=0, column=8)
 	w.grid(row=1)
 	f.grid(row=0)
 	top.mainloop()
