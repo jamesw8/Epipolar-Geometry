@@ -249,7 +249,7 @@ def testPoints():
 				arrow = w.create_line(x1, y1, x2, y2, width=2, arrow=tkinter.LAST)
 				test_arrows.append(arrow)
 			createTestEpipolarLines()
-			testButton.config(state="normal", text="Add control points")
+		testButton.config(state="normal", text="Add control points")
 	else:
 		testButton.config(state="normal", text="Add test points")
 	test_mode = not test_mode
