@@ -7,7 +7,7 @@ from subprocess import call
 def call_draw(algorithm):
 	try:
 		call(["python", "draw.py", "-a", algorithm])
-	except ImportError:
+	except:
 		call(["python3", "draw.py", "-a", algorithm])
 
 if __name__ == '__main__':
