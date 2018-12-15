@@ -49,6 +49,10 @@ debug_mode = True
 debug_p_image = [(254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)]
 debug_q_image = [(973.0, 209.0), (1107.0, 198.0), (970.0, 236.0), (1113.0, 231.0), (1157.0, 162.0), (1182.0, 138.0), (1122.0, 143.0), (983.0, 287.0), (730.0, 400.0), (1094.0, 286.0), (1220.0, 231.0)]
 
+preset_test_points_mode = True
+preset_test_p = [(254.0, 140.0), (393.0, 147.0), (252.0, 173.0), (397.0, 177.0), (369.0, 94.0), (400.0, 65.0), (334.0, 61.0), (267.0, 229.0), (160.0, 344.0), (381.0, 233.0), (511.0, 198.0)]
+preset_test_q = [(973.0, 209.0), (1107.0, 198.0), (970.0, 236.0), (1113.0, 231.0), (1157.0, 162.0), (1182.0, 138.0), (1122.0, 143.0), (983.0, 287.0), (730.0, 400.0), (1094.0, 286.0), (1220.0, 231.0)]
+
 test_mode = False
 normalize = True
 resize = True
@@ -193,6 +197,7 @@ def createEpipolarLine(F, point, add, color):
 # Draw test point epipolar lines
 def createTestEpipolarLines():
 	global w, test_epilines
+
 	assert F_estimate != [], "Need fundamental matrix first"
 
 	for epiline in test_epilines:
@@ -230,9 +235,21 @@ def printPoints():
 	print('New', new)
 # Add test points to test fundamental matrix
 def testPoints():
-	global test_mode
+	global test_mode, preset_test_points_mode
 	if not test_mode:
-		testButton.config(state="normal", text="Add control points")
+		if preset_test_points_mode:
+			test_original = preset_test_p
+			test_new = preset_test_q
+			for index in range(len(test_original)):
+				x1 = test_original[index][0]
+				y1 = test_original[index][1]
+				x2 = test_new[index][0]
+				y2 = test_new[index][1]
+				#print(x1, y1, x2,y2)
+				arrow = w.create_line(x1, y1, x2, y2, width=2, arrow=tkinter.LAST)
+				test_arrows.append(arrow)
+			createTestEpipolarLines()
+			testButton.config(state="normal", text="Add control points")
 	else:
 		testButton.config(state="normal", text="Add test points")
 	test_mode = not test_mode
